@@ -1,0 +1,5 @@
+package my:new-world;
+
+world new-world {
+  export query: func(name: string) -> string;
+}

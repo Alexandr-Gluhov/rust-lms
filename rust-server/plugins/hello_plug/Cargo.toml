@@ -1,0 +1,13 @@
+[package]
+name = "hello_plug"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+lms_plugin_api = {path = "../../lms_plugin_api"}
+
+[package.metadata.component]  
+package = "my:new-world"
+
+[lib]
+crate-type = ["cdylib"]

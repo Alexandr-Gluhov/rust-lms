@@ -1,0 +1,5 @@
+rust-server/target
+rust-server/lms_plugin_api/target
+rust-server/plugins/hello_plug/target
+postgres/data
+.idea
