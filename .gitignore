@@ -1,5 +1,7 @@
 rust-server/target
 rust-server/lms_plugin_api/target
 rust-server/plugins/hello_plug/target
+rust-server/plugins/sleeppy/target
+rust-server/plugins/not_found/target
 postgres/data
 .idea

@@ -30,16 +30,16 @@ let windowsCreator = {
     let windowTemplate = document.createElement('div');
     windowTemplate.classList.add('window');
 
-    windowTemplate.innerHTML =`<div class="name">${nameContent}</div><div class="discription">${discriptionContent}</div>`
+    windowTemplate.innerHTML = `<div class="name">${nameContent}</div><div class="discription">${discriptionContent}</div>`
 
     windowTemplate.getElementsByClassName('name')[0].addEventListener('click', this.getWindowSwitchHandler(windowInfo));
 
     return windowTemplate;
-    
+
   },
 
   getWindowSwitchHandler(windowInfo) {
-    return async function(event) {
+    return async (event) => {
 
       let windowElement = event.target.parentElement;
 
@@ -53,7 +53,11 @@ let windowsCreator = {
 
         windowElement.lastChild.hidden = true;
 
+        this.addLoadingAnimation(windowElement);
+
         let response = await fetch(`/api/${windowInfo.plugin}/open/${windowInfo.query}`);
+
+        windowElement.lastChild.remove();
 
         let responseText = await response.text();
 
@@ -63,6 +67,25 @@ let windowsCreator = {
     }
   },
 
+  addLoadingAnimation(element) {
+    let div = document.createElement('div');
+    div.classList.add('loading');
+    element.append(div);
+    let spinner = document.createElement('div');
+    spinner.classList.add('spinner');
+    let block = document.createElement('div');
+    block.classList.add('block');
+
+    setTimeout(() => {
+      if (element.lastChild.hidden !== true) {
+        div.append(spinner, block);
+      }
+    });
+
+  }
+
 }
+
+
 
 export default windowsCreator;

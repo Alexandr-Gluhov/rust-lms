@@ -1,5 +1,5 @@
 use std::{
-    io::{prelude::*, BufReader}, net::{TcpListener, TcpStream},
+    io::{prelude::*, BufReader}, net::{TcpListener, TcpStream}, thread, time,
 };
 
 mod plugin_manager;
@@ -22,6 +22,8 @@ impl Server {
         
         let listener = TcpListener::bind(addr).expect(&format!("Can't bind address {addr}"));
 
+        self.plugin_manager.load_plugin("not_found").unwrap();
+
         for stream in listener.incoming() {
 
             let stream = stream.unwrap();
@@ -36,6 +38,8 @@ impl Server {
         let buf_reader = BufReader::new(&mut stream);
         let request_line = buf_reader.lines().next().unwrap().unwrap();
 
+        let mut code = "200 OK";
+
         let mut uri = request_line
             .split_whitespace()
             .skip(1)
@@ -43,13 +47,19 @@ impl Server {
             .unwrap()
             .split("/")
             .skip(2);
-        let plug = uri.next()?;
-        let query = uri.next()?;
+        let mut plug = uri.next()?;
+        let mut query = uri.next()?;
         println!("/{plug}/{query}");
+
+        if plug == "sleeppy" && query == "open" {
+            thread::sleep(time::Duration::from_secs(10));
+        }
 
         if !self.plugin_manager.has_plugin(plug) {
             if let Err(_) = self.plugin_manager.load_plugin(plug) {
-                return None;
+                query = plug;
+                plug = "not_found";
+                code = "404 NOT FOUND";
             }
         }
 
@@ -61,7 +71,7 @@ impl Server {
         let content_length = content.len();
 
         let response =
-            format!("HTTP/1.1 200 OK\r\nContent-length: {content_length}\r\n\r\n{content}");
+            format!("HTTP/1.1 {code}\r\nContent-length: {content_length}\r\n\r\n{content}");
 
         stream.write_all(response.as_bytes()).unwrap();
         Some(())

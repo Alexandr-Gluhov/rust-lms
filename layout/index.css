@@ -136,3 +136,38 @@ aside
     width: 90%;
 }
 
+div.loading
+{
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+    padding: 15px;
+    width: 80px;
+    height: 80px;
+    animation: loading-spinner 1s ease-in-out infinite;
+}
+
+.loading > .spinner {
+    border-radius: 50%;
+    border: solid 5px black;
+    height: 50px;
+    width: 50px;
+}
+
+.loading > .block {
+    position: relative;
+    bottom: 25px;
+    width: 50px;
+    height: 25px;
+    background-color: rgb(230, 230, 230)
+}
+
+
+@keyframes loading-spinner {
+    0% {
+        transform: rotate(0deg)
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
