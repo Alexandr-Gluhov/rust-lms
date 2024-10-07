@@ -16,7 +16,7 @@ impl HttpRequestParser {
     }
 
     pub fn get_uri(&self) -> String {
-        self.request.split_whitespace().skip(1).next().unwrap().into()
+        self.request.split_whitespace().skip(1).next().unwrap().split("?").next().unwrap().into()
     }
 }
 
@@ -61,9 +61,9 @@ impl Server {
         let mut code = "200 OK";
         
         if uri == "/" {
-            content = fs::read("/files/index.html")?;
+            content = fs::read("/files/blocks/index.html")?;
         } else {
-            if let Ok(cont) = fs::read(format!("/files{uri}")) {
+            if let Ok(cont) = fs::read(format!("/files/blocks{uri}")) {
                 content = cont;
                 let mime_type = mime_guess::from_path(&uri).first_or_octet_stream().to_string();
                 headers.push(format!("Content-Type: {mime_type}"));

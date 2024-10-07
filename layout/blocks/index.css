@@ -164,7 +164,7 @@ div.loading
 
 .message {
     text-align: center;
-    background-color: red;
+    background-color: rgb(255, 68, 68);
     padding: 30px;
     position: fixed;
     right: 10px;
