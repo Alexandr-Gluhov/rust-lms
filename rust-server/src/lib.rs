@@ -1,79 +1,90 @@
 use std::{
-    io::{prelude::*, BufReader}, net::{TcpListener, TcpStream}, thread, time,
+    error::Error, fs, io::{prelude::*, BufReader}, net::{TcpListener, TcpStream}
 };
 
-mod plugin_manager;
-use plugin_manager::PluginManager;
-
 pub struct Server {
+    listener: TcpListener
+}
 
-    plugin_manager: PluginManager,
+pub struct HttpRequestParser {
+    request: String,
+}
 
+impl HttpRequestParser {
+    pub fn new(request: String) -> Self {
+        Self{request}
+    }
+
+    pub fn get_uri(&self) -> String {
+        self.request.split_whitespace().skip(1).next().unwrap().into()
+    }
 }
 
 impl Server {
-    pub fn new() -> Self {
+    pub fn new(addr: &str) -> Self {
         Self {
-            plugin_manager: PluginManager::new(),
+            listener: TcpListener::bind(addr).expect(&format!("Can't bind address {addr}")),
         }
     }
 
-    pub fn start(&mut self, addr: &str) {
-        
-        let listener = TcpListener::bind(addr).expect(&format!("Can't bind address {addr}"));
-
-        self.plugin_manager.load_plugin("not_found").unwrap();
-
-        for stream in listener.incoming() {
+    pub fn start(&self) {
+        for stream in self.listener.incoming() {
 
             let stream = stream.unwrap();
 
-            if let None = self.handle_connection(stream) {
-                println!("Incorrect query structure");
+            if let Err(_) = self.handle_connection(stream) {
+                println!("Incorrect query");
             }
         }
     }
 
-    fn handle_connection(&mut self, mut stream: TcpStream) -> Option<()> {
-        let buf_reader = BufReader::new(&mut stream);
-        let request_line = buf_reader.lines().next().unwrap().unwrap();
+    fn handle_connection(&self, mut stream: TcpStream) -> Result<(), Box<dyn Error>> {
 
+        let buf_reader = BufReader::new(&stream);
+
+        let request = buf_reader
+        .lines()
+        .map(|result| result.unwrap())
+        .take_while(|line| !line.is_empty())
+        .collect();
+
+        let request_reader = HttpRequestParser::new(request);
+
+        println!("{}", request_reader.get_uri());
+
+        let uri = request_reader.get_uri();
+
+        let content;
+
+        let mut headers = Vec::new();
+        
         let mut code = "200 OK";
-
-        let mut uri = request_line
-            .split_whitespace()
-            .skip(1)
-            .next()
-            .unwrap()
-            .split("/")
-            .skip(2);
-        let mut plug = uri.next()?;
-        let mut query = uri.next()?;
-        println!("/{plug}/{query}");
-
-        if plug == "sleeppy" && query == "open" {
-            thread::sleep(time::Duration::from_secs(10));
-        }
-
-        if !self.plugin_manager.has_plugin(plug) {
-            if let Err(_) = self.plugin_manager.load_plugin(plug) {
-                query = plug;
-                plug = "not_found";
+        
+        if uri == "/" {
+            content = fs::read("/files/index.html")?;
+        } else {
+            if let Ok(cont) = fs::read(format!("/files{uri}")) {
+                content = cont;
+                let mime_type = mime_guess::from_path(&uri).first_or_octet_stream().to_string();
+                headers.push(format!("Content-Type: {mime_type}"));
+            } else {
+                mime_guess::from_path("/files/blocks/404.html").first_or_octet_stream().to_string();
+                content = fs::read(format!("/files/blocks/404.html"))?;
                 code = "404 NOT FOUND";
             }
         }
 
-        let component = self.plugin_manager.get_plugin(plug);
-        let new_world = self.plugin_manager.instantiate_world(&component).unwrap();
+        
 
-        let content = new_world.call_query(self.plugin_manager.get_store(), query).unwrap();
+        headers.push(format!("Content-length: {}", content.len()));
 
-        let content_length = content.len();
+        let headers = headers.join(";\r\n");
 
         let response =
-            format!("HTTP/1.1 {code}\r\nContent-length: {content_length}\r\n\r\n{content}");
+            format!("HTTP/1.1 {code}\r\n{headers}\r\n\r\n");
 
-        stream.write_all(response.as_bytes()).unwrap();
-        Some(())
+        stream.write(response.as_bytes()).unwrap();
+        stream.write(&content).unwrap();
+        Ok(())
     }
 }

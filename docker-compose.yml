@@ -4,19 +4,12 @@ services:
     image: rust
     volumes:
       - ./rust-server/:/app
+      - ./layout/:/files
     entrypoint: ["/bin/sh", "-c", "/app/server.sh"]
     networks:
       - backend
-
-  nginx:
-    image: nginx:alpine
     ports:
       - 80:80
-    volumes:
-      - ./layout/:/var/www:ro
-      - ./nginx/nginx.conf://etc/nginx/nginx.conf:ro
-    networks:
-      - backend
 
   postgres:
     image: postgres

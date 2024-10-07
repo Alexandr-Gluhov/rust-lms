@@ -6,6 +6,13 @@ let windowsCreator = {
 
     let response = await fetch(`/api/${plugin}/${query}`);
 
+    if (response.status === 404) {
+
+      this.displayMessage("Запрашиваемый ресурс не найден, или не сущесвует");
+
+      return;
+    }
+
     let responseText = await response.text()
 
     let content = JSON.parse(responseText);
@@ -82,6 +89,20 @@ let windowsCreator = {
       }
     });
 
+  },
+
+  async displayMessage(message) {
+    let div = document.createElement('div');
+    div.classList.add('message');
+
+    let response = await fetch('/files/blocks/404.html');
+
+    div.innerHTML = await response.text();
+    div.lastElementChild.innerText = message;
+
+    document.body.append(div);
+    setTimeout(() => div.style.opacity = '0');
+    setTimeout(() => div.remove(), 5000);
   }
 
 }

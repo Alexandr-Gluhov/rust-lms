@@ -162,6 +162,17 @@ div.loading
     background-color: rgb(230, 230, 230)
 }
 
+.message {
+    text-align: center;
+    background-color: red;
+    padding: 30px;
+    position: fixed;
+    right: 10px;
+    bottom: 10px;
+    width: 200px;
+    border-radius: 25px;
+    transition: opacity 5s linear;
+}
 
 @keyframes loading-spinner {
     0% {

@@ -1,7 +1,7 @@
 use rust_server::Server;
 
 fn main() {
-    let mut server = Server::new();
+    let server = Server::new("0.0.0.0:80");
 
-    server.start("0.0.0.0:9000");
+    server.start();
 }
