@@ -1,11 +1,13 @@
-import windowsCreator from "./js/windowsCreator.js"
+import windowsCreator from "./js/windowsCreator.js";
 
-let element = document.getElementsByClassName('courses')[0];
+let element = document.getElementsByClassName("courses")[0];
 
-windowsCreator.createWindow(element, 'sleeppy', 'sth');
-windowsCreator.createWindow(element, 'sth', 'sth');
+windowsCreator.createWindow(element, "sleeppy", "sth");
+windowsCreator.createWindow(element, "sth", "sth");
+
+windowsCreator.createWindow(element, "common_image");
 
 for (let i = 0; i < 10; i++) {
-    windowsCreator.createWindow(element, 'hello', 'somebody');
-    windowsCreator.createWindow(element, 'hello', 'somebody_else');
+  windowsCreator.createWindow(element, "common_message");
+  windowsCreator.createWindow(element, "hello", "somebody_else");
 }
