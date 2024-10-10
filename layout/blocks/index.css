@@ -82,14 +82,6 @@ main
         justify-content: space-around;
 }
 
-aside
-{
-    width: 20%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
 .window
 {
     margin: 10px 0;
@@ -102,12 +94,6 @@ aside
     overflow: hidden;
 }
 
-.window > div
-{
-    text-align: center;
-    padding: 5px;
-}
-
 .name
 {
     height: 50px;
@@ -117,14 +103,27 @@ aside
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
     cursor: pointer;
+    text-align: center;
+    padding: 5px;
+}
+
+.discription
+{
+    text-align: center;
+    padding: 5px;
 }
 
 .opened
 {
     min-height: 100px;
     height: fit-content;
-    width: calc(90% + 10%/3);
+    width: calc(100% - 10%/3);
     background-color: inherit;
+}
+
+.tiny
+{
+    width: 100px;
 }
 
 .tasks-list

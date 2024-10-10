@@ -1,8 +1,12 @@
 import deserializer from "./deserializer.js";
 
 let windowsCreator = {
+  register: [],
+
+  openedCount: 0,
+
   async createWindow(parent, block) {
-    let response = await fetch(`/${block}/closed.html`);
+    let response = await fetch(`/${block}/closed.html`).catch();
 
     if (response.status === 404) {
       this.displayMessage("Запрашиваемый ресурс не найден, или не сущесвует");
@@ -12,7 +16,10 @@ let windowsCreator = {
 
     let responseText = await response.text();
 
-    parent.append(this.getWindowTemplate(block, responseText));
+    let windowTemplate = this.getWindowTemplate(block, responseText)
+
+    parent.append(windowTemplate);
+    this.register.push(windowTemplate);
   },
 
   getWindowTemplate(block, innerHTML) {
@@ -33,15 +40,37 @@ let windowsCreator = {
       let windowElement = event.target.parentElement;
 
       if (!windowElement.classList.toggle("opened")) {
-        let response = await fetch(`/${block}/closed.html`);
-        let innerHTML = response.text();
-        windowElement.innerHTML = innerHTML;
+        windowElement.lastElementChild.remove();
+        windowElement.lastElementChild.hidden = false;
+        if (!--this.openedCount) {
+          this.register.forEach(wind => {
+            wind.classList.remove('tiny');
+            document.querySelector('.courses').append(wind);
+        });
+        } else {
+          windowElement.classList.add('tiny');
+          document.querySelector('.aside').prepend(windowElement);
+        }
       } else {
-        let response = await fetch(`/${block}/openned.html`);
+        windowElement.lastElementChild.hidden = true;
+        this.addLoadingAnimation(windowElement);
+        let response = await fetch(`/${block}/content.html`);
         let innerHTML = await response.text();
-        windowElement.innerHTML = innerHTML;
-        console.log("sth");
-        //this.addLoadingAnimation(windowElement);
+        let content = document.createElement('div');
+        content.innerHTML = innerHTML;
+        windowElement.lastElementChild.remove();
+        windowElement.append(content);
+        if (this.openedCount) {
+          windowElement.classList.remove("tiny");
+          document.querySelector('.courses').append(windowElement);
+        } else {
+          this.register.forEach((wind) => {
+            if (!wind.classList.contains("opened")) {
+              wind.classList.add('tiny');
+              document.querySelector('.aside').append(wind);
+          }})
+        }
+        this.openedCount++;
       }
     };
   },
@@ -72,7 +101,7 @@ let windowsCreator = {
     div.lastElementChild.innerText = message;
 
     document.body.append(div);
-    setTimeout(() => (div.style.opacity = "0"));
+    setTimeout(() => div.style.opacity = "0");
     setTimeout(() => div.remove(), 5000);
   },
 };
