@@ -16,7 +16,8 @@ let windowsCreator = {
 
     let responseText = await response.text();
 
-    let windowTemplate = this.getWindowTemplate(block, responseText)
+    let windowTemplate = this.getWindowTemplate(block, responseText);
+    windowTemplate.type = block;
 
     parent.append(windowTemplate);
     this.register.push(windowTemplate);
@@ -43,32 +44,57 @@ let windowsCreator = {
         windowElement.lastElementChild.remove();
         windowElement.lastElementChild.hidden = false;
         if (!--this.openedCount) {
-          this.register.forEach(wind => {
-            wind.classList.remove('tiny');
-            document.querySelector('.courses').append(wind);
-        });
+          this.register.forEach((wind) => {
+            wind.classList.remove("tiny");
+            document.querySelector(".courses").append(wind);
+            if (wind.lastElementChild.className === "icon") {
+              wind.lastElementChild.remove();
+              wind.lastElementChild.hidden = false;
+              wind.firstElementChild.hidden = false;
+            }
+          });
         } else {
-          windowElement.classList.add('tiny');
-          document.querySelector('.aside').prepend(windowElement);
+          windowElement.classList.add("tiny");
+          document.querySelector(".aside").prepend(windowElement);
+          let icon = await fetch(`/${block}/tiny.html`);
+          let result = await icon.text();
         }
       } else {
         windowElement.lastElementChild.hidden = true;
         this.addLoadingAnimation(windowElement);
         let response = await fetch(`/${block}/content.html`);
         let innerHTML = await response.text();
-        let content = document.createElement('div');
+        let content = document.createElement("div");
         content.innerHTML = innerHTML;
         windowElement.lastElementChild.remove();
         windowElement.append(content);
         if (this.openedCount) {
           windowElement.classList.remove("tiny");
-          document.querySelector('.courses').append(windowElement);
+          document.querySelector(".courses").append(windowElement);
         } else {
-          this.register.forEach((wind) => {
-            if (!wind.classList.contains("opened")) {
-              wind.classList.add('tiny');
-              document.querySelector('.aside').append(wind);
-          }})
+          this.register.forEach(async (wind) => {
+            if (wind !== windowElement) {
+              if (wind.classList.contains("opened")) {
+                wind.firstElementChild.click();
+              }
+              wind.classList.add("tiny");
+              document.querySelector(".aside").append(wind);
+            }
+
+            let icon = await fetch(`/${wind.type}/tiny.html`);
+            if (icon.status !== 404 && wind !== windowElement) {
+              wind.lastElementChild.hidden = true;
+              wind.firstElementChild.hidden = true;
+              let div = document.createElement("div");
+              div.addEventListener("click", () => {
+                wind.firstElementChild.click();
+                wind.firstElementChild.hidden = false;
+              });
+              div.innerHTML = await icon.text();
+              div.className = "icon";
+              wind.append(div);
+            }
+          });
         }
         this.openedCount++;
       }
@@ -101,7 +127,7 @@ let windowsCreator = {
     div.lastElementChild.innerText = message;
 
     document.body.append(div);
-    setTimeout(() => div.style.opacity = "0");
+    setTimeout(() => (div.style.opacity = "0"));
     setTimeout(() => div.remove(), 5000);
   },
 };
