@@ -3,7 +3,7 @@ import deserializer from "./deserializer.js";
 let windowsCreator = {
   register: [],
 
-  openedCount: 0,
+  opened: null,
 
   async createWindow(parent, block) {
     let response = await fetch(`/${block}/closed.html`).catch();
@@ -40,63 +40,23 @@ let windowsCreator = {
     return async (event) => {
       let windowElement = event.target.parentElement;
 
-      if (!windowElement.classList.toggle("opened")) {
-        windowElement.lastElementChild.remove();
-        windowElement.lastElementChild.hidden = false;
-        if (!--this.openedCount) {
-          this.register.forEach((wind) => {
-            wind.classList.remove("tiny");
-            document.querySelector(".courses").append(wind);
-            if (wind.lastElementChild.className === "icon") {
-              wind.lastElementChild.remove();
-              wind.lastElementChild.hidden = false;
-              wind.firstElementChild.hidden = false;
-            }
-          });
+      if (windowElement.classList.toggle("opened")) {
+        if (!this.opened) {
+          this.openWindow(windowElement);
+
+          this.makeIcons();
+          this.opened = windowElement;
         } else {
-          windowElement.classList.add("tiny");
-          document.querySelector(".aside").prepend(windowElement);
-          let icon = await fetch(`/${block}/tiny.html`);
-          let result = await icon.text();
+          this.closeWindow(this.opened);
+          this.makeIcon(this.opened);
+          this.openWindow(windowElement);
+          this.opened = windowElement;
         }
       } else {
-        windowElement.lastElementChild.hidden = true;
-        this.addLoadingAnimation(windowElement);
-        let response = await fetch(`/${block}/content.html`);
-        let innerHTML = await response.text();
-        let content = document.createElement("div");
-        content.innerHTML = innerHTML;
-        windowElement.lastElementChild.remove();
-        windowElement.append(content);
-        if (this.openedCount) {
-          windowElement.classList.remove("tiny");
-          document.querySelector(".courses").append(windowElement);
-        } else {
-          this.register.forEach(async (wind) => {
-            if (wind !== windowElement) {
-              if (wind.classList.contains("opened")) {
-                wind.firstElementChild.click();
-              }
-              wind.classList.add("tiny");
-              document.querySelector(".aside").append(wind);
-            }
+        this.opened = null;
 
-            let icon = await fetch(`/${wind.type}/tiny.html`);
-            if (icon.status !== 404 && wind !== windowElement) {
-              wind.lastElementChild.hidden = true;
-              wind.firstElementChild.hidden = true;
-              let div = document.createElement("div");
-              div.addEventListener("click", () => {
-                wind.firstElementChild.click();
-                wind.firstElementChild.hidden = false;
-              });
-              div.innerHTML = await icon.text();
-              div.className = "icon";
-              wind.append(div);
-            }
-          });
-        }
-        this.openedCount++;
+        this.closeWindow(windowElement);
+        this.makeWindowsFromIcons();
       }
     };
   },
@@ -129,6 +89,65 @@ let windowsCreator = {
     document.body.append(div);
     setTimeout(() => (div.style.opacity = "0"));
     setTimeout(() => div.remove(), 5000);
+  },
+
+  async makeIcons() {
+    for (let i = this.register.length - 1; i >= 0; i--) {
+      if (!this.register[i].classList.contains("opened")) {
+        await this.makeIcon(this.register[i]);
+      }
+    }
+  },
+
+  async makeIcon(windowElement) {
+    windowElement.classList.add("tiny");
+    let icon = await fetch(`/${windowElement.type}/tiny.html`);
+    let div = document.createElement("div");
+    div.innerHTML = await icon.text();
+    windowElement.firstElementChild.hidden = true;
+    windowElement.lastElementChild.hidden = true;
+    windowElement.append(div);
+    document.querySelector(".aside").prepend(windowElement);
+
+    windowElement.lastElementChild.addEventListener("click", () => {
+      this.makeWindowFromIcon(windowElement);
+      windowElement.firstElementChild.click();
+    });
+  },
+
+  makeWindowsFromIcons() {
+    this.register.forEach((icon) => {
+      if (icon.classList.contains("tiny")) {
+        this.makeWindowFromIcon(icon);
+      }
+    });
+  },
+
+  makeWindowFromIcon(icon) {
+    icon.classList.remove("tiny");
+    icon.lastElementChild.remove();
+    icon.firstElementChild.hidden = false;
+    icon.lastElementChild.hidden = false;
+    document.querySelector(".courses").append(icon);
+  },
+
+  closeWindow(windowElement) {
+    windowElement.classList.remove("opened");
+    windowElement.lastElementChild.remove();
+    windowElement.lastElementChild.hidden = false;
+  },
+
+  async openWindow(windowElement) {
+    windowElement.classList.add("opened");
+    windowElement.lastElementChild.hidden = true;
+    console.log(windowElement.lastElementChild);
+    this.addLoadingAnimation(windowElement);
+    let response = await fetch(`/${windowElement.type}/content.html`);
+    let innerHTML = await response.text();
+    let content = document.createElement("div");
+    content.innerHTML = innerHTML;
+    windowElement.lastElementChild.remove();
+    windowElement.append(content);
   },
 };
 
