@@ -5,6 +5,14 @@ let windowsCreator = {
 
   opened: null,
 
+  async createWindows(parent) {
+    let response = await fetch("/get_plugins");
+    let plugins = await response.json();
+    for (let plugin of plugins) {
+      this.createWindow(parent, plugin);
+    }
+  },
+
   async createWindow(parent, block) {
     let response = await fetch(`/${block}/closed.html`).catch();
 
