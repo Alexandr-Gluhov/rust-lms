@@ -52,10 +52,6 @@ header > div {
     justify-content: center;
 }
 
-.content > * {
-    background-color: rgb(230, 230, 230);
-}
-
 main {
     max-width: 900px;
     min-width: 900px;
@@ -116,6 +112,7 @@ main {
     margin: 5px;
     background: none;
     box-shadow: none;
+    filter: drop-shadow(5px 5px 3px black);
     transition:
         width 1s linear,
         height 1s linear,

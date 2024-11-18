@@ -9,7 +9,7 @@ let windowsCreator = {
     let response = await fetch("/get_plugins");
     let plugins = await response.json();
     for (let plugin of plugins) {
-      this.createWindow(parent, plugin);
+      await this.createWindow(parent, plugin);
     }
   },
 

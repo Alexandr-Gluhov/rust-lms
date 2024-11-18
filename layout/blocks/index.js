@@ -2,5 +2,10 @@ import windowsCreator from "./js/windowsCreator.js";
 
 let element = document.getElementsByClassName("courses")[0];
 
-windowsCreator.createWindows(element);
-windowsCreator.createWindows(element);
+async function start() {
+    await windowsCreator.createWindows(element);
+    await windowsCreator.createWindows(element);
+    windowsCreator.register[0].querySelector('.name').click();
+}
+
+start();
