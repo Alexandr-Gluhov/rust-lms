@@ -8,13 +8,21 @@ use axum::{
 
 use std::fs;
 
-#[tokio::main]
-async fn main() {
-    let app = Router::new()
+struct RouterFabric {}
+
+impl RouterFabric {
+    fn new() -> Router {
+        Router::new()
         .route("/", get(root))
         .route("/get_plugins", get(get_plugins))
         .route("/*file", get(root_file))
-        .fallback(not_found);
+        .fallback(not_found)
+    }
+}
+
+#[tokio::main]
+async fn main() {
+    let app = RouterFabric::new();
     let listener = tokio::net::TcpListener::bind("0.0.0.0:80").await.unwrap();
     axum::serve(listener, app).await.unwrap();
 }
@@ -60,10 +68,10 @@ async fn root_file(Path(file): Path<String>) -> Response {
                 content,
             ).into_response()
         }
-        Err(_) => not_found().await,
+        Err(_) => not_found().await.into_response()
     }
 }
 
-async fn not_found() -> Response {
-    fs::read_to_string("/files/blocks/404.html").unwrap().into_response()
+async fn not_found() -> Html<String> {
+    Html(fs::read_to_string("/files/blocks/404.html").unwrap())
 }
