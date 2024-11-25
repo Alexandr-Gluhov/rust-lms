@@ -32,7 +32,7 @@ async fn root() -> Html<String> {
 }
 
 async fn get_plugins() -> Response {
-    let pathes = fs::read_dir("/files/blocks").expect("Can't read path!");
+    let pathes = fs::read_dir("/files/blocks").expect("Can't read the path");
     let mut plugins = String::from("[");
     for path in pathes {
         let element = path

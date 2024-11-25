@@ -1,11 +1,21 @@
-import windowsCreator from "./js/windowsCreator.js";
+import WindowManager from "./js/windowManager.js";
+import Window from "./js/window.js";
 
-let element = document.getElementsByClassName("courses")[0];
+let centralWindow = new Window();
+centralWindow.toggle();
+document.getElementsByClassName("courses")[0].append(centralWindow.state);
 
 async function start() {
-    await windowsCreator.createWindows(element);
-    await windowsCreator.createWindows(element);
-    windowsCreator.register[0].querySelector('.name').click();
+    await centralWindow.init("main_struct");
+    let element = centralWindow.state;
+    element.classList.add('outer');
+    let pull = element.querySelector('.aside');
+    let manager = new WindowManager(element.querySelector('.content'), pull);
+    await manager.createWindows();
+    await manager.createWindows();
+
+    console.log(manager.register);
+
 }
 
 start();
