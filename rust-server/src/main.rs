@@ -6,6 +6,8 @@ use axum::{
     http::{StatusCode, header}
 };
 
+use tokio_postgres::{NoTls, Error};
+
 use std::fs;
 
 struct RouterFabric {}
@@ -21,10 +23,27 @@ impl RouterFabric {
 }
 
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<(), Error> {
+    let (client, connection) = tokio_postgres::connect("postgres://pguser:234234@postgres/lms", NoTls).await?;
+
+    tokio::spawn(async move {
+        if let Err(e) = connection.await {
+            eprintln!("connection error: {}", e);
+        }
+    });
+
+    let rows = client
+        .query("SELECT name FROM users", &[])
+        .await?;
+
+    let value: &str = rows[0].get(0);
+
+    println!("{value}");
+
     let app = RouterFabric::new();
     let listener = tokio::net::TcpListener::bind("0.0.0.0:80").await.unwrap();
     axum::serve(listener, app).await.unwrap();
+    Ok(())
 }
 
 async fn root() -> Html<String> {
