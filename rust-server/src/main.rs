@@ -3,22 +3,29 @@ use axum::{
     extract::Path,
     response::{Html, Response, IntoResponse},
     routing::get,
-    http::{StatusCode, header}
+    http::{StatusCode, header},
 };
 
 use tokio_postgres::{NoTls, Error};
 
 use std::fs;
 
+use rust_server::user::User;
+
+use tower_sessions::{Expiry, MemoryStore, Session, SessionManagerLayer};
+
+use time::Duration;
+
 struct RouterFabric {}
 
 impl RouterFabric {
-    fn new() -> Router {
+    fn new(session_layer: SessionManagerLayer<MemoryStore>) -> Router {
         Router::new()
         .route("/", get(root))
         .route("/get_plugins", get(get_plugins))
         .route("/*file", get(root_file))
         .fallback(not_found)
+        .layer(session_layer)
     }
 }
 
@@ -26,21 +33,31 @@ impl RouterFabric {
 async fn main() -> Result<(), Error> {
     let (client, connection) = tokio_postgres::connect("postgres://pguser:234234@postgres/lms", NoTls).await?;
 
+    let session_store = MemoryStore::default();
+    let session_layer = SessionManagerLayer::new(session_store)
+        .with_secure(false)
+        .with_expiry(Expiry::OnInactivity(Duration::minutes(30)));
+
     tokio::spawn(async move {
         if let Err(e) = connection.await {
             eprintln!("connection error: {}", e);
         }
     });
 
-    let rows = client
-        .query("SELECT name FROM users", &[])
-        .await?;
+    let surname =  String::from("Глухов");
+    let name = String::from("Александр");
+    let patronymic = Some(String::from("Владимирович"));
+    let email = String::from("prib-222_897175@volru.ru");
+    let password = String::from("5743");
+    let group_id = 1;
 
-    let value: &str = rows[0].get(0);
+    //let message = User::register(&client, name, surname, patronymic, email, password, group_id).await;
 
-    println!("{value}");
+    //println!("{:?}", message);
 
-    let app = RouterFabric::new();
+    User::login(&client, &email, &password).await;
+
+    let app = RouterFabric::new(session_layer);
     let listener = tokio::net::TcpListener::bind("0.0.0.0:80").await.unwrap();
     axum::serve(listener, app).await.unwrap();
     Ok(())
