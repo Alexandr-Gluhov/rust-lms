@@ -12,7 +12,6 @@ async function start() {
     let pull = element.querySelector('.aside');
     let manager = new WindowManager(element.querySelector('.content'), pull);
     await manager.createWindows();
-    await manager.createWindows();
 
     console.log(manager.register);
 

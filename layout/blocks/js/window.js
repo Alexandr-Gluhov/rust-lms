@@ -24,20 +24,25 @@ class Window {
         let nameResponse = await fetch(`/${plug}/name.html`).catch();
         let contentResponse = await fetch(`/${plug}/content.html`).catch();
         let tinyResponse = await fetch(`/${plug}/tiny.html`).catch();
+        let scriptResponse = await fetch(`/${plug}/script.js`).catch();
 
         if (nameResponse.status === 404 || contentResponse.status === 404 || tinyResponse.status === 404) {
             Notifier.displayMessage(`Запрашиваемый ресурс ${plug} не найден, или не сущесвует`);
             return;
         }
 
-        let nameResponseText = await nameResponse.text();
-        this.name.innerHTML = nameResponseText;
+        this.name.innerHTML = await nameResponse.text();
 
-        let contentResponseText = await contentResponse.text();
-        this.content.innerHTML = contentResponseText;
+        this.content.innerHTML = await contentResponse.text();
 
-        let tinyResponseText = await tinyResponse.text();
-        this.tiny.innerHTML = tinyResponseText;
+        this.tiny.innerHTML = await tinyResponse.text();
+
+        if (scriptResponse.status === 200) {
+            let script = document.createElement('script');
+            script.src = `/${plug}/script.js`;
+            script.type = 'module';
+            this.content.appendChild(script);
+        }
     }
 
     toggle() {

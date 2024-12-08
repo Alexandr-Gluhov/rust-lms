@@ -48,7 +48,7 @@ class WindowManager {
 
   async createWindows() {
 
-    let response = await fetch("/get_plugins");
+    let response = await fetch("/get_windows");
     let plugins = await response.json();
 
     for (let plugin of plugins) {

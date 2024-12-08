@@ -742,6 +742,7 @@ dependencies = [
  "argon2",
  "axum",
  "mime_guess",
+ "serde",
  "time",
  "tokio",
  "tokio-postgres",
