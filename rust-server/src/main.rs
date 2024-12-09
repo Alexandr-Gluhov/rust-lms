@@ -11,6 +11,7 @@ use tokio_postgres::{Error, NoTls};
 use std::{fs, sync::Arc};
 
 use rust_server::group::Group;
+use rust_server::news::News;
 use rust_server::user::User;
 
 use tower_sessions::{Expiry, MemoryStore, Session, SessionManagerLayer};
@@ -31,8 +32,10 @@ impl RouterFabric {
             .route("/get_windows", get(get_windows))
             .route("/get_groups", get(get_groups))
             .route("/get_user", get(get_user))
+            .route("/get_news", get(get_news))
             .route("/login", post(login))
             .route("/register", post(register))
+            .route("/logout", post(logout))
             .route("/*file", get(root_file))
             .fallback(not_found)
             .layer(session_layer)
@@ -259,6 +262,31 @@ async fn login(
         StatusCode::UNAUTHORIZED,
         [(header::CONTENT_TYPE, "text/html; charset=utf-8")],
         "Проиозшла ошибка при попытке авторизации",
+    )
+        .into_response()
+}
+
+async fn get_news(State(state): State<Arc<AppState>>, session: Session) -> Response {
+    let user_id: i32 = session.get("user_id").await.unwrap().unwrap_or(1);
+    let records = News::get_by_user_id(&state.client, user_id).await;
+    Json(
+        records
+            .iter()
+            .map(|row| News {
+                id: row.get::<_, i32>("id"),
+                text: row.get::<_, String>("text"),
+            })
+            .collect::<Vec<_>>(),
+    )
+    .into_response()
+}
+
+async fn logout(session: Session) -> Response {
+    session.remove::<i32>("user_id").await.unwrap();
+    (
+        StatusCode::OK,
+        [(header::CONTENT_TYPE, "text/html; charset=utf-8")],
+        "Вы вышли из системы",
     )
         .into_response()
 }

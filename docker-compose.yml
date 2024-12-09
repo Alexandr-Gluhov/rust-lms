@@ -32,7 +32,9 @@ services:
       - backend
     environment:
       PGADMIN_DEFAULT_EMAIL: "sanjok2505@gmail.com"
-      PGADMIN_DEFAULT_PASSWORD: "5743"  
+      PGADMIN_DEFAULT_PASSWORD: "5743"
+    volumes:
+      - ./postgres/init:/var/lib/pgadmin/storage/sanjok2505_gmail.com
 
 networks:
   backend:

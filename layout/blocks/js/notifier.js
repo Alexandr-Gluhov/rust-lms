@@ -3,10 +3,7 @@ class Notifier {
         let div = document.createElement("div");
         div.classList.add("message");
     
-        let response = await fetch("/files/blocks/404.html");
-    
-        div.innerHTML = await response.text();
-        div.lastElementChild.innerText = message;
+        div.innerText = message;
     
         document.body.append(div);
         setTimeout(() => (div.style.opacity = "0"));
