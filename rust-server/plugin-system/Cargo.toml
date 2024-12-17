@@ -1,0 +1,8 @@
+[package]
+name = "plugin-system"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+mlua = { version = "0.10.2", features = ["lua54", "vendored", "async"] }
+tokio-postgres = "0.7.12"

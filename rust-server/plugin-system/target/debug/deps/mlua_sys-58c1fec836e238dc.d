@@ -1,0 +1,10 @@
+C:\Users\sanjo\Projects\university\rust-lms\rust-server\plugin-system\target\debug\deps\libmlua_sys-58c1fec836e238dc.rmeta: C:\Users\sanjo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\mlua-sys-0.6.6\src/lib.rs C:\Users\sanjo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\mlua-sys-0.6.6\src\macros.rs C:\Users\sanjo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\mlua-sys-0.6.6\src\lua54\mod.rs C:\Users\sanjo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\mlua-sys-0.6.6\src\lua54\lauxlib.rs C:\Users\sanjo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\mlua-sys-0.6.6\src\lua54\lua.rs C:\Users\sanjo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\mlua-sys-0.6.6\src\lua54\lualib.rs
+
+C:\Users\sanjo\Projects\university\rust-lms\rust-server\plugin-system\target\debug\deps\mlua_sys-58c1fec836e238dc.d: C:\Users\sanjo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\mlua-sys-0.6.6\src/lib.rs C:\Users\sanjo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\mlua-sys-0.6.6\src\macros.rs C:\Users\sanjo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\mlua-sys-0.6.6\src\lua54\mod.rs C:\Users\sanjo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\mlua-sys-0.6.6\src\lua54\lauxlib.rs C:\Users\sanjo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\mlua-sys-0.6.6\src\lua54\lua.rs C:\Users\sanjo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\mlua-sys-0.6.6\src\lua54\lualib.rs
+
+C:\Users\sanjo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\mlua-sys-0.6.6\src/lib.rs:
+C:\Users\sanjo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\mlua-sys-0.6.6\src\macros.rs:
+C:\Users\sanjo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\mlua-sys-0.6.6\src\lua54\mod.rs:
+C:\Users\sanjo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\mlua-sys-0.6.6\src\lua54\lauxlib.rs:
+C:\Users\sanjo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\mlua-sys-0.6.6\src\lua54\lua.rs:
+C:\Users\sanjo\.cargo\registry\src\index.crates.io-6f17d22bba15001f\mlua-sys-0.6.6\src\lua54\lualib.rs:

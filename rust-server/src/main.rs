@@ -19,9 +19,10 @@ use tower_sessions::{Expiry, MemoryStore, Session, SessionManagerLayer};
 use serde::Deserialize;
 use time::Duration;
 
-struct AppState {
-    client: tokio_postgres::Client,
-}
+use plugin_system::{
+    PluginSystem,
+    AppState,
+};
 
 struct RouterFabric {}
 
@@ -107,8 +108,15 @@ async fn get_windows(session: Session) -> Response {
     }
 }
 
-async fn root_file(Path(file): Path<String>) -> Response {
+async fn root_file(Path(file): Path<String>, State(state): State<Arc<AppState>>) -> Response {
     let file_path = format!("/files/blocks/{file}");
+    if file.ends_with(".lua") {
+
+        let script = fs::read_to_string(&file_path).unwrap();
+        PluginSystem::execute(state, &script);
+
+        return Html("Скрипт успешно выполнен").into_response();
+    }
     match fs::read(&file_path) {
         Ok(content) => {
             let mime_type = mime_guess::from_path(&file_path).first_or_text_plain();
@@ -239,7 +247,7 @@ async fn login(
     session: Session,
     Form(params): Form<LoginParams>,
 ) -> Response {
-    if (User::approve_login(&state.client, &params.email, &params.password).await) {
+    if User::approve_login(&state.client, &params.email, &params.password).await {
         session
             .insert(
                 "user_id",
